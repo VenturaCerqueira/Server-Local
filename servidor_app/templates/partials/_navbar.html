@@ -1,0 +1,54 @@
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+        <button class="btn btn-link me-2" id="sidebar-toggle" style="color: var(--primary-color);">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <a class="navbar-brand nav-link-loader" href="/">
+            <i class="bi bi-cloud-haze me-2"></i>Servidor de Arquivos
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent" aria-controls="mainNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbarContent">
+            <ul class="navbar-nav me-auto"></ul>
+
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item">
+                    <button class="btn btn-link nav-link" id="layout-toggle">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-link nav-link" id="search-toggle">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-link nav-link" id="theme-toggle">
+                        <i class="bi bi-sun"></i>
+                    </button>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle user-dropdown-btn" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span>{{ current_user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="#">Configurações</a></li>
+                        <li><a class="dropdown-item" href="#">Perfil</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.logout') }}" title="Sair">
+                        <i class="bi bi-box-arrow-right" style="font-size: 1.2rem;"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

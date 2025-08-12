@@ -1,0 +1,109 @@
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Carregando...</span>
+    </div>
+</div>
+
+<div id="search-overlay" class="search-overlay"></div>
+<div id="search-modal" class="search-modal">
+    <div class="search-input-group">
+        <i class="bi bi-search me-2" style="font-size: 1.25rem; color: var(--text-color-muted);"></i>
+        <input type="text" id="search-input" class="form-control" placeholder="Buscar arquivos e pastas..." autofocus>
+        <span class="search-shortcut ms-2">Ctrl K</span>
+    </div>
+    <div class="search-results-container">
+        <ul id="search-results-list" class="search-results">
+        </ul>
+    </div>
+</div>
+
+<div class="modal fade" id="propertiesModal" tabindex="-1" aria-labelledby="propertiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="propertiesModalLabel">Propriedades</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr><th scope="row" class="w-25">Nome:</th><td id="prop-name"></td></tr>
+                        <tr><th scope="row">Tipo:</th><td id="prop-type"></td></tr>
+                        <tr id="file-size-row" style="display: none;">
+                            <th scope="row">Tamanho:</th><td id="prop-size"></td>
+                        </tr>
+                        <tr id="file-size-bytes-row" style="display: none;">
+                            <th scope="row">Tamanho (bytes):</th><td id="prop-size-bytes"></td>
+                        </tr>
+                        <tr id="folder-count-row" style="display: none;">
+                            <th scope="row">Conteúdo:</th><td id="prop-counts"></td>
+                        </tr>
+                        <tr><th scope="row">Modificado em:</th><td id="prop-modified"></td></tr>
+                        <tr><th scope="row">Criado em:</th><td id="prop-created"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content card-elegant-upload">
+            <div class="modal-header modal-header-upload">
+                <h5 class="modal-title modal-title-upload" id="uploadModalLabel">Upload de Arquivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="modal-body modal-body-upload">
+                    <input type="hidden" id="current-path-input" name="current_path" value="{{ current_path }}">
+                    <div class="mb-3">
+                        <label for="file-input" class="form-label form-label-upload">Selecione o arquivo para upload</label>
+                        <input class="form-control form-control-upload" type="file" id="file-input" name="file" required>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-upload">
+                    <button type="button" class="btn btn-secondary btn-secondary-upload" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary btn-primary-upload" id="upload-btn">
+                        <span id="upload-spinner" class="spinner-border spinner-border-sm me-2 spinner-border-upload" role="status" aria-hidden="true" style="display: none;"></span>
+                        Fazer Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content card-elegant-upload">
+            <div class="modal-header modal-header-upload">
+                <h5 class="modal-title modal-title-upload" id="newFolderModalLabel">Criar Nova Pasta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="new-folder-form">
+                <div class="modal-body modal-body-upload">
+                    <input type="hidden" id="new-folder-path-input" name="current_path" value="{{ current_path }}">
+                    <div class="mb-3">
+                        <label for="folder-name-input" class="form-label form-label-upload">Nome da nova pasta</label>
+                        <input type="text" class="form-control form-control-upload" id="folder-name-input" name="folder_name" required>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-upload">
+                    <button type="button" class="btn btn-secondary btn-secondary-upload" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary btn-primary-upload" id="create-folder-btn">
+                        <span id="create-folder-spinner" class="spinner-border spinner-border-sm me-2 spinner-border-upload" role="status" aria-hidden="true" style="display: none;"></span>
+                        Criar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<button class="fab-upload" data-bs-toggle="modal" data-bs-target="#uploadModal">
+    <i class="bi bi-plus-lg"></i>
+</button>

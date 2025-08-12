@@ -3,12 +3,13 @@ from flask import (
     send_file, request, jsonify, redirect, url_for, flash
 )
 from werkzeug.utils import secure_filename
-from servidor_app.models.file_system_model import FileSystemModel
-from servidor_app.services.server_info_service import get_server_info
+from ..models.file_system_model import FileSystemModel
+from ..services.server_info_service import get_server_info
 from flask_login import login_user, logout_user, login_required, current_user
 import os
 
-from servidor_app.models.user_model import users
+from ..models.user_model import User
+from .. import db
 
 main_bp = Blueprint('main', __name__)
 
@@ -21,17 +22,47 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        user = users.get(username)
+        user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password):
-            login_user(user)
-            flash('Login bem-sucedido!', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.index'))
-        else:
+        if user is None or not user.check_password(password):
             flash('Nome de usuário ou senha inválidos.', 'danger')
+            return redirect(url_for('main.login'))
+
+        login_user(user)
+        flash('Login bem-sucedido!', 'success')
+        next_page = request.args.get('next')
+        return redirect(next_page or url_for('main.index'))
     
     return render_template('login.html')
+
+@main_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if not username or not password:
+            flash('Usuário e senha são obrigatórios.', 'danger')
+            return redirect(url_for('main.register'))
+
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Este nome de usuário já está em uso. Por favor, escolha outro.', 'danger')
+            return redirect(url_for('main.register'))
+
+        new_user = User(username=username)
+        new_user.set_password(password)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('Sua conta foi criada com sucesso! Agora você pode fazer login.', 'success')
+        return redirect(url_for('main.login'))
+
+    return render_template('register.html')
 
 @main_bp.route('/logout')
 @login_required
@@ -40,7 +71,6 @@ def logout():
     flash('Você foi desconectado.', 'info')
     return redirect(url_for('main.login'))
 
-# Adicionar @login_required para proteger as rotas
 @main_bp.route('/')
 @login_required 
 def index():
@@ -72,7 +102,6 @@ def browse_path(sub_path):
         return "Diretório não encontrado", 404
     except Exception as e:
         return f"Erro ao acessar o diretório: {e}", 500
-
 
 @main_bp.route('/download/<path:file_path>')
 def download_file(file_path):
@@ -117,7 +146,6 @@ def upload_file():
         current_app.logger.error(f"Erro ao fazer upload do arquivo: {e}")
         return jsonify({'success': False, 'message': f'Ocorreu um erro interno: {str(e)}'}), 500
 
-# Nova rota para criar pastas
 @main_bp.route('/create_folder', methods=['POST'])
 def create_folder():
     try:
