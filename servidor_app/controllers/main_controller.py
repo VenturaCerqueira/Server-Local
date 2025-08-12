@@ -1,16 +1,48 @@
-# servidor_app/controllers/main_controller.py
 from flask import (
-    Blueprint, render_template, current_app, send_from_directory, 
-    send_file, request, jsonify
+    Blueprint, render_template, current_app, send_from_directory,
+    send_file, request, jsonify, redirect, url_for, flash
 )
 from werkzeug.utils import secure_filename
 from servidor_app.models.file_system_model import FileSystemModel
 from servidor_app.services.server_info_service import get_server_info
+from flask_login import login_user, logout_user, login_required, current_user
 import os
+
+from servidor_app.models.user_model import users
 
 main_bp = Blueprint('main', __name__)
 
+@main_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = users.get(username)
+
+        if user and user.check_password(password):
+            login_user(user)
+            flash('Login bem-sucedido!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('main.index'))
+        else:
+            flash('Nome de usuário ou senha inválidos.', 'danger')
+    
+    return render_template('login.html')
+
+@main_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Você foi desconectado.', 'info')
+    return redirect(url_for('main.login'))
+
+# Adicionar @login_required para proteger as rotas
 @main_bp.route('/')
+@login_required 
 def index():
     try:
         fs_model = FileSystemModel(current_app.config['ROOT_DIR'])
@@ -25,22 +57,22 @@ def index():
         return f"Erro ao acessar o diretório raiz: {e}", 500
 
 @main_bp.route('/browse/<path:sub_path>')
+@login_required
 def browse_path(sub_path):
     try:
         fs_model = FileSystemModel(current_app.config['ROOT_DIR'])
-        server_data = get_server_info(current_app.config['ROOT_DIR'])
         pastas, current_path, parent_path = fs_model.list_directory(sub_path)
+        server_data = get_server_info(current_app.config['ROOT_DIR'], sub_path)
         return render_template('index.html', 
                                dados_servidor=server_data, 
                                pastas=pastas, 
-                               current_path=current_path,
+                               current_path=current_path, 
                                parent_path=parent_path)
     except FileNotFoundError:
         return "Diretório não encontrado", 404
-    except PermissionError as e:
-        return f"Acesso Negado: {e}", 403
     except Exception as e:
         return f"Erro ao acessar o diretório: {e}", 500
+
 
 @main_bp.route('/download/<path:file_path>')
 def download_file(file_path):

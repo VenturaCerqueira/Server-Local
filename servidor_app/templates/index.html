@@ -769,6 +769,12 @@ style="width: {{ dados_servidor.disk_percent }}%;"></div>
                     </table>
                 </div>
                 <div class="modal-footer">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
