@@ -76,6 +76,7 @@ def logout():
 def index():
     try:
         fs_model = FileSystemModel(current_app.config['ROOT_DIR'])
+        # CORREÇÃO: Chamando get_server_info() com apenas um argumento (o root_dir)
         server_data = get_server_info(current_app.config['ROOT_DIR'])
         pastas, current_path, parent_path = fs_model.list_directory()
         return render_template('index.html', 
@@ -92,7 +93,8 @@ def browse_path(sub_path):
     try:
         fs_model = FileSystemModel(current_app.config['ROOT_DIR'])
         pastas, current_path, parent_path = fs_model.list_directory(sub_path)
-        server_data = get_server_info(current_app.config['ROOT_DIR'], sub_path)
+        # CORREÇÃO: Chamando get_server_info() com apenas um argumento (o root_dir)
+        server_data = get_server_info(current_app.config['ROOT_DIR'])
         return render_template('index.html', 
                                dados_servidor=server_data, 
                                pastas=pastas, 
